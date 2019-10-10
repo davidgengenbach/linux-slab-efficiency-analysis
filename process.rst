@@ -27,6 +27,29 @@ seperatedly in time.
 Taken from
 `linux/tools/vm/slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c#L644>`__
 
+Install instructions
+--------------------
+
+.. code:: bash
+
+   # or via ssh
+   git clone --depth 1 https://github.com/intel/lkp-tests
+
+   cd lkp-tests
+   # If this fails, try another OS
+   sudo make install
+
+   cd ..
+
+   # Adapt the lkp-tests/hosts/YOUR_HOSTNAME file to have a `hdd_partition` section
+   # You can use the `create-block-device.sh` script provided in the root of this repository 
+
+   # This MUST be done after EVERY change to the "lkp-tests/hosts/YOUR_HOSTNAME" file!
+   lkp split lkp-tests/jobs/fsmark-1hdd.yaml
+
+   sudo lkp install fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
+   sudo lkp run fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
+
 Result
 ------
 
@@ -45,15 +68,15 @@ whole time.
 .. code:: ipython3
 
     # Convert this notebook
-    !jupyter nbconvert --to markdown process.ipynb
+    !jupyter nbconvert --to rst process.ipynb
 
 
 .. parsed-literal::
 
-    [NbConvertApp] Converting notebook process.ipynb to markdown
+    [NbConvertApp] Converting notebook process.ipynb to rst
     [NbConvertApp] Support files will be in process_files/
     [NbConvertApp] Making directory process_files
-    [NbConvertApp] Writing 9637 bytes to process.md
+    [NbConvertApp] Writing 10706 bytes to process.rst
 
 
 Retrieve lkp-tests result folder from VM
