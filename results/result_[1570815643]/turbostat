@@ -1,0 +1,41 @@
+turbostat version 17.04.12 - Len Brown <lenb@kernel.org>
+CPUID(0): GenuineIntel 13 CPUID levels; family:model:stepping 0x6:2a:7 (6:42:7)
+CPUID(1): SSE3 - - - - TSC MSR - -
+CPUID(6): No-APERF, No-TURBO, No-DTS, No-PTM, No-HWP, No-HWPnotify, No-HWPwindow, No-HWPepp, No-HWPpkg, No-EPB
+cpu0: MSR_IA32_MISC_ENABLE: 0x00001801 (No-TCC No-EIST MWAIT PREFETCH TURBO)
+CPUID(7): No-SGX
+cpu0: MSR_MISC_PWR_MGMT: 0x00000000 (ENable-EIST_Coordination DISable-EPB DISable-OOB)
+RAPL: inf sec. Joule Counter Range, at 0 Watts
+cpu0: MSR_PLATFORM_INFO: 0x22220000002200
+34 * 100.0 = 3400.0 MHz max efficiency frequency
+34 * 100.0 = 3400.0 MHz base frequency
+cpu0: MSR_IA32_POWER_CTL: 0x00000000 (C1E auto-promotion: DISabled)
+cpu0: MSR_TURBO_RATIO_LIMIT: 0x1a1a1c1d
+26 * 100.0 = 2600.0 MHz max turbo 4 active cores
+26 * 100.0 = 2600.0 MHz max turbo 3 active cores
+28 * 100.0 = 2800.0 MHz max turbo 2 active cores
+29 * 100.0 = 2900.0 MHz max turbo 1 active cores
+cpu0: MSR_PKG_CST_CONFIG_CONTROL: 0x1e000001 (UNdemote-C3, UNdemote-C1, demote-C3, demote-C1, UNlocked: pkg-cstate-limit=1: pc2)
+NSFOD /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver
+cpu0: MSR_MISC_FEATURE_CONTROL: 0x00000000 (L2-Prefetch L2-Prefetch-pair L1-Prefetch L1-IP-Prefetch)
+cpu0: MSR_RAPL_POWER_UNIT: 0x00000000 (1.000000 Watts, 1.000000 Joules, 0.000977 sec.)
+cpu0: MSR_PKG_POWER_INFO: 0x00000000 (0 W TDP, RAPL 0 - 0 W, 0.000000 sec.)
+cpu0: MSR_PKG_POWER_LIMIT: 0x00000000 (UNlocked)
+cpu0: PKG Limit #1: DISabled (0.000000 Watts, 0.000977 sec, clamp DISabled)
+cpu0: PKG Limit #2: DISabled (0.000000 Watts, 0.000977* sec, clamp DISabled)
+cpu0: MSR_PP0_POLICY: 0
+cpu0: MSR_PP0_POWER_LIMIT: 0x00000000 (UNlocked)
+cpu0: Cores Limit: DISabled (0.000000 Watts, 0.000977 sec, clamp DISabled)
+cpu0: MSR_PP1_POLICY: 0
+cpu0: MSR_PP1_POWER_LIMIT: 0x00000000 (UNlocked)
+cpu0: GFX Limit: DISabled (0.000000 Watts, 0.000977 sec, clamp DISabled)
+cpu0: MSR_PKGC3_IRTL: 0x00000000 (NOTvalid, 0 ns)
+cpu0: MSR_PKGC6_IRTL: 0x00000000 (NOTvalid, 0 ns)
+cpu0: MSR_PKGC7_IRTL: 0x00000000 (NOTvalid, 0 ns)
+189.152502 sec
+Core	CPU	TSC_MHz	IRQ	SMI	CPU%c1	CPU%c3	CPU%c6	CPU%c7	Pkg%pc2	PkgWatt	CorWatt	GFXWatt
+-	-	3410	662979	0	100.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00
+0	0	3410	159770	0	100.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00
+1	1	3410	135602	0	100.00	0.00	0.00	0.00
+2	2	3410	236494	0	100.00	0.00	0.00	0.00
+3	3	3410	131113	0	100.00	0.00	0.00	0.00

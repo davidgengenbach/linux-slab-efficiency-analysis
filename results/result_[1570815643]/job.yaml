@@ -1,0 +1,82 @@
+---
+
+#! lkp-tests/jobs/fsmark-1hdd.yaml
+suite: fsmark
+testcase: fsmark
+category: benchmark
+iterations: 1x
+nr_threads: 32t
+disk: 1HDD
+fs: ext4
+fs2: 
+fsmark:
+  filesize: 9B
+  test_size: 400M
+  sync_method: fsyncBeforeClose
+  nr_directories: 16d
+  nr_files_per_directory: 256fpd
+job_origin: lkp-tests/jobs/fsmark-1hdd.yaml
+testbox: david-vm-ubuntu
+arch: x86_64
+tbox_group: david-vm-ubuntu
+
+#! hosts/david-vm-ubuntu
+nr_cpu: 4
+memory: 15G
+hdd_partitions: "/dev/loop15"
+ssd_partitions: 
+local_run: 1
+
+#! include/category/benchmark
+kmsg: 
+boot-time: 
+uptime: 
+iostat: 
+heartbeat: 
+vmstat: 
+numa-numastat: 
+numa-vmstat: 
+numa-meminfo: 
+proc-vmstat: 
+proc-stat: 
+meminfo: 
+slabinfo: 
+slabinfo_tool: 
+interrupts: 
+lock_stat: 
+latency_stats: 
+softirqs: 
+bdi_dev_mapping: 
+diskstats: 
+nfsstat: 
+cpuidle: 
+cpufreq-stats: 
+turbostat: 
+sched_debug: 
+perf-stat: 
+mpstat: 
+perf-profile: 
+
+#! include/disk/nr_hdd
+need_kconfig:
+- CONFIG_BLK_DEV_SD
+- CONFIG_SCSI
+- CONFIG_BLOCK=y
+- CONFIG_SATA_AHCI
+- CONFIG_SATA_AHCI_PLATFORM
+- CONFIG_ATA
+- CONFIG_PCI=y
+- CONFIG_NFSD
+- CONFIG_EXT4_FS
+
+#! include/fsmark
+
+#! include/fs/OTHERS
+
+#! default params
+kconfig: x86_64-rhel-7.6
+compiler: gcc-7
+commit: 5.0.0-31-generic
+rootfs: ubuntu
+NO_NETWORK: 1
+LKP_LOCAL_RUN: 1

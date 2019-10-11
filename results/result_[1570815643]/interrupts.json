@@ -1,0 +1,186 @@
+{
+  "interrupts.time": [
+    1570815211.4769661,
+    1570815400.6789293
+  ],
+  "interrupts.CPU0.0:IO-APIC.2-edge.timer": [
+    30,
+    30
+  ],
+  "interrupts.0:IO-APIC.2-edge.timer": [
+    30,
+    30
+  ],
+  "interrupts.CPU2.1:IO-APIC.1-edge.i8042": [
+    9,
+    9
+  ],
+  "interrupts.1:IO-APIC.1-edge.i8042": [
+    9,
+    9
+  ],
+  "interrupts.CPU1.12:IO-APIC.12-edge.i8042": [
+    158,
+    158
+  ],
+  "interrupts.12:IO-APIC.12-edge.i8042": [
+    158,
+    158
+  ],
+  "interrupts.CPU3.15:IO-APIC.15-edge.ata_piix": [
+    5028,
+    5216
+  ],
+  "interrupts.15:IO-APIC.15-edge.ata_piix": [
+    5028,
+    5216
+  ],
+  "interrupts.CPU1.18:IO-APIC.18-fasteoi.vmwgfx": [
+    85,
+    88
+  ],
+  "interrupts.CPU2.18:IO-APIC.18-fasteoi.vmwgfx": [
+    58,
+    58
+  ],
+  "interrupts.18:IO-APIC.18-fasteoi.vmwgfx": [
+    143,
+    146
+  ],
+  "interrupts.CPU3.19:IO-APIC.19-fasteoi.enp0s3": [
+    131929,
+    132188
+  ],
+  "interrupts.19:IO-APIC.19-fasteoi.enp0s3": [
+    131929,
+    132188
+  ],
+  "interrupts.CPU1.20:IO-APIC.20-fasteoi.vboxguest": [
+    3,
+    3
+  ],
+  "interrupts.20:IO-APIC.20-fasteoi.vboxguest": [
+    3,
+    3
+  ],
+  "interrupts.CPU0.21:IO-APIC.21-fasteoi.ahci[0000:00:0d.0],snd_intel8x0": [
+    13302,
+    13302
+  ],
+  "interrupts.CPU2.21:IO-APIC.21-fasteoi.ahci[0000:00:0d.0],snd_intel8x0": [
+    387414,
+    481411
+  ],
+  "interrupts.21:IO-APIC.21-fasteoi.ahci[0000:00:0d.0],snd_intel8x0": [
+    400716,
+    494713
+  ],
+  "interrupts.CPU0.22:IO-APIC.22-fasteoi.ohci_hcd:usb1": [
+    26,
+    26
+  ],
+  "interrupts.22:IO-APIC.22-fasteoi.ohci_hcd:usb1": [
+    26,
+    26
+  ],
+  "interrupts.CPU0.LOC:Local_timer_interrupts": [
+    224500,
+    262024
+  ],
+  "interrupts.CPU1.LOC:Local_timer_interrupts": [
+    217732,
+    254370
+  ],
+  "interrupts.CPU2.LOC:Local_timer_interrupts": [
+    242510,
+    281612
+  ],
+  "interrupts.CPU3.LOC:Local_timer_interrupts": [
+    229562,
+    261892
+  ],
+  "interrupts.LOC:Local_timer_interrupts": [
+    914304,
+    1059898
+  ],
+  "interrupts.CPU0.RES:Rescheduling_interrupts": [
+    183148,
+    219584
+  ],
+  "interrupts.CPU1.RES:Rescheduling_interrupts": [
+    197579,
+    235268
+  ],
+  "interrupts.CPU2.RES:Rescheduling_interrupts": [
+    180724,
+    210434
+  ],
+  "interrupts.CPU3.RES:Rescheduling_interrupts": [
+    170528,
+    206474
+  ],
+  "interrupts.RES:Rescheduling_interrupts": [
+    731979,
+    871760
+  ],
+  "interrupts.CPU0.CAL:Function_call_interrupts": [
+    332081,
+    417854
+  ],
+  "interrupts.CPU1.CAL:Function_call_interrupts": [
+    314586,
+    375699
+  ],
+  "interrupts.CPU2.CAL:Function_call_interrupts": [
+    166661,
+    240187
+  ],
+  "interrupts.CPU3.CAL:Function_call_interrupts": [
+    294713,
+    356980
+  ],
+  "interrupts.CAL:Function_call_interrupts": [
+    1108041,
+    1390720
+  ],
+  "interrupts.CPU0.TLB:TLB_shootdowns": [
+    13943,
+    14059
+  ],
+  "interrupts.CPU1.TLB:TLB_shootdowns": [
+    13788,
+    13990
+  ],
+  "interrupts.CPU2.TLB:TLB_shootdowns": [
+    20850,
+    21059
+  ],
+  "interrupts.CPU3.TLB:TLB_shootdowns": [
+    15112,
+    15260
+  ],
+  "interrupts.TLB:TLB_shootdowns": [
+    63693,
+    64368
+  ],
+  "interrupts.CPU0.MCP:Machine_check_polls": [
+    16,
+    17
+  ],
+  "interrupts.CPU1.MCP:Machine_check_polls": [
+    16,
+    17
+  ],
+  "interrupts.CPU2.MCP:Machine_check_polls": [
+    16,
+    17
+  ],
+  "interrupts.CPU3.MCP:Machine_check_polls": [
+    16,
+    17
+  ],
+  "interrupts.MCP:Machine_check_polls": [
+    64,
+    68
+  ]
+}

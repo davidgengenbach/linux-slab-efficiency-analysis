@@ -1,0 +1,12 @@
+2019-10-11 19:33:32 fs_mark -d /fs/loop15/1 -d /fs/loop15/2 -d /fs/loop15/3 -d /fs/loop15/4 -d /fs/loop15/5 -d /fs/loop15/6 -d /fs/loop15/7 -d /fs/loop15/8 -d /fs/loop15/9 -d /fs/loop15/10 -d /fs/loop15/11 -d /fs/loop15/12 -d /fs/loop15/13 -d /fs/loop15/14 -d /fs/loop15/15 -d /fs/loop15/16 -d /fs/loop15/17 -d /fs/loop15/18 -d /fs/loop15/19 -d /fs/loop15/20 -d /fs/loop15/21 -d /fs/loop15/22 -d /fs/loop15/23 -d /fs/loop15/24 -d /fs/loop15/25 -d /fs/loop15/26 -d /fs/loop15/27 -d /fs/loop15/28 -d /fs/loop15/29 -d /fs/loop15/30 -d /fs/loop15/31 -d /fs/loop15/32 -D 16 -N 256 -n 3200 -L 1 -S 1 -s 9
+
+#  fs_mark  -d  /fs/loop15/1  -d  /fs/loop15/2  -d  /fs/loop15/3  -d  /fs/loop15/4  -d  /fs/loop15/5  -d  /fs/loop15/6  -d  /fs/loop15/7  -d  /fs/loop15/8  -d  /fs/loop15/9  -d  /fs/loop15/10  -d  /fs/loop15/11  -d  /fs/loop15/12  -d  /fs/loop15/13  -d  /fs/loop15/14  -d  /fs/loop15/15  -d  /fs/loop15/16  -d  /fs/loop15/17  -d  /fs/loop15/18  -d  /fs/loop15/19  -d  /fs/loop15/20  -d  /fs/loop15/21  -d  /fs/loop15/22  -d  /fs/loop15/23  -d  /fs/loop15/24  -d  /fs/loop15/25  -d  /fs/loop15/26  -d  /fs/loop15/27  -d  /fs/loop15/28  -d  /fs/loop15/29  -d  /fs/loop15/30  -d  /fs/loop15/31  -d  /fs/loop15/32  -D  16  -N  256  -n  3200  -L  1  -S  1  -s  9 
+#	Version 3.3, 32 thread(s) starting at Fri Oct 11 19:33:32 2019
+#	Sync method: INBAND FSYNC: fsync() per file in write loop.
+#	Directories:  Round Robin between directories across 16 subdirectories with 256 files per subdirectory.
+#	File names: 40 bytes long, (16 initial bytes of time stamp with 24 random bytes at end of name)
+#	Files info: size 9 bytes, written with an IO size of 16384 bytes per write
+#	App overhead is time in microseconds spent in the test not doing file writing related system calls.
+
+FSUse%        Count         Size    Files/sec     App Overhead
+    10       102400            9        566.2          9193328

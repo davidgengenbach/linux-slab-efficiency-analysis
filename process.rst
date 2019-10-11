@@ -6,17 +6,14 @@ In this notebook, I retrieve the results from a
 `lkp-tests <https://github.com/intel/lkp-tests>`__ benchmark and process
 the ``slabinfo`` file in it.
 
-**NOTE:** ``lkp-tests`` only sampled from ``/proc/slabinfo`` and **not**
-from ``/sys/kernel/slab/...``. So I added a custom monitor to
-``lkp-tests`` which gathers the data extracted by the
-`linux/tools/vm/slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c>`__
-tool.
+The raw benchmark result data resides in
+`result\_[157081564] <results/result_%5B1570815643%5D/>`__.
+
+**NOTE:** The specs of the used VM are attached at the end of this
+notebook.
 
 **Benchmark name:**
 ``fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml``
-
-**NOTE:** The specs of the VM (used to run the benchmark) is attached at
-the end of this notebook.
 
 How the efficiency was calculated
 ---------------------------------
@@ -71,7 +68,7 @@ Install instructions
     [NbConvertApp] Making directory process_files
     [NbConvertApp] Making directory process_files
     [NbConvertApp] Making directory process_files
-    [NbConvertApp] Writing 18528 bytes to process.rst
+    [NbConvertApp] Writing 19560 bytes to process.rst
 
 
 Retrieve lkp-tests result folder from VM
@@ -113,7 +110,7 @@ Parse results
 
     import os
     from glob import glob
-    FOLDER = sorted(glob('results/result_*'))[0]
+    FOLDER = sorted(glob('results/result_*'))[-1]
     IMAGE_FOLDER = 'images'
     
     os.makedirs(IMAGE_FOLDER, exist_ok=True)
@@ -157,7 +154,7 @@ Parse results
 
 .. parsed-literal::
 
-    '/lkp/result/fsmark/1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M/david-vm-ubuntu/ubuntu/x86_64-rhel-7.6/gcc-7/5.0.0-31-generic/12'
+    '/lkp/result/fsmark/1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M/david-vm-ubuntu/ubuntu/x86_64-rhel-7.6/gcc-7/5.0.0-31-generic/13'
 
 
 
@@ -165,10 +162,18 @@ slabinfo tool
 -------------
 
 See
-`slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c#L644>`__
+`slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c>`__
 for more information.
 
 The tool uses ``/sys/kernel/slab/...`` and **NOT** ``/proc/slabinfo``.
+
+The raw data resides in the `slabinfo\_tool file in the results
+folder <https://raw.githubusercontent.com/davidgengenbach/linux-slab-efficiency-analysis/master/results/result_%5B1570815643%5D/slabinfo_tool>`__.
+
+**NOTE:** So I added a custom monitor to ``lkp-tests`` which gathers the
+data extracted by the
+`linux/tools/vm/slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c>`__
+tool since ``lkp-tests`` did not provide this data.
 
 .. code:: ipython3
 
@@ -222,7 +227,7 @@ Plot efficiency (histogram)
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f6c91a11668>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f1170465f28>
 
 
 
@@ -291,7 +296,7 @@ Plot efficiency of specific cache (dentry)
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f6c9bdc5518>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f1170219860>
 
 
 
@@ -299,10 +304,10 @@ Plot efficiency of specific cache (dentry)
 .. image:: process_files/process_17_1.png
 
 
-Most unefficient cache
+Most inefficient cache
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Get most unefficient cache - averaged over time.
+Get most inefficient cache - averaged over time.
 
 .. code:: ipython3
 
@@ -343,54 +348,44 @@ Get most unefficient cache - averaged over time.
       </thead>
       <tbody>
         <tr>
-          <th>skbuff_head_cache</th>
-          <td>72.000000</td>
-          <td>98.300000</td>
-        </tr>
-        <tr>
           <th>scsi_sense_cache</th>
           <td>75.000000</td>
           <td>20.400000</td>
         </tr>
         <tr>
-          <th>kmalloc-96</th>
-          <td>78.903955</td>
-          <td>391.393220</td>
-        </tr>
-        <tr>
-          <th>names_cache</th>
-          <td>82.033898</td>
-          <td>442.582486</td>
-        </tr>
-        <tr>
-          <th>:a-0000256</th>
-          <td>82.706215</td>
-          <td>102.264407</td>
+          <th>skbuff_head_cache</th>
+          <td>76.000000</td>
+          <td>98.300000</td>
         </tr>
         <tr>
           <th>task_struct</th>
-          <td>83.785311</td>
-          <td>3890.621469</td>
+          <td>82.323864</td>
+          <td>3993.600000</td>
+        </tr>
+        <tr>
+          <th>names_cache</th>
+          <td>83.034091</td>
+          <td>431.680114</td>
+        </tr>
+        <tr>
+          <th>:a-0000256</th>
+          <td>83.965909</td>
+          <td>104.541477</td>
+        </tr>
+        <tr>
+          <th>anon_vma</th>
+          <td>85.039773</td>
+          <td>819.292045</td>
+        </tr>
+        <tr>
+          <th>cred_jar</th>
+          <td>86.000000</td>
+          <td>257.767045</td>
         </tr>
         <tr>
           <th>:0000320</th>
           <td>86.000000</td>
           <td>368.600000</td>
-        </tr>
-        <tr>
-          <th>cred_jar</th>
-          <td>86.000000</td>
-          <td>278.453672</td>
-        </tr>
-        <tr>
-          <th>anon_vma</th>
-          <td>88.649718</td>
-          <td>824.288701</td>
-        </tr>
-        <tr>
-          <th>jbd2_journal_head</th>
-          <td>88.774011</td>
-          <td>173.901130</td>
         </tr>
         <tr>
           <th>squashfs_inode_cache</th>
@@ -404,8 +399,8 @@ Get most unefficient cache - averaged over time.
         </tr>
         <tr>
           <th>biovec-max</th>
-          <td>90.016949</td>
-          <td>976.010734</td>
+          <td>90.886364</td>
+          <td>961.258523</td>
         </tr>
         <tr>
           <th>TCPv6</th>
@@ -413,13 +408,23 @@ Get most unefficient cache - averaged over time.
           <td>131.000000</td>
         </tr>
         <tr>
+          <th>:0000256</th>
+          <td>91.869318</td>
+          <td>208.250000</td>
+        </tr>
+        <tr>
           <th>bdev_cache</th>
           <td>92.000000</td>
           <td>65.500000</td>
         </tr>
         <tr>
+          <th>jbd2_journal_head</th>
+          <td>92.000000</td>
+          <td>190.690909</td>
+        </tr>
+        <tr>
           <th>kmalloc-1k</th>
-          <td>92.502825</td>
+          <td>93.000000</td>
           <td>1331.200000</td>
         </tr>
         <tr>
@@ -433,16 +438,6 @@ Get most unefficient cache - averaged over time.
           <td>3788.800000</td>
         </tr>
         <tr>
-          <th>sighand_cache</th>
-          <td>93.768362</td>
-          <td>851.900000</td>
-        </tr>
-        <tr>
-          <th>dax_cache</th>
-          <td>94.000000</td>
-          <td>32.700000</td>
-        </tr>
-        <tr>
           <th>file_lock_cache</th>
           <td>94.000000</td>
           <td>16.300000</td>
@@ -453,19 +448,29 @@ Get most unefficient cache - averaged over time.
           <td>131.000000</td>
         </tr>
         <tr>
-          <th>kmalloc-512</th>
-          <td>94.994350</td>
-          <td>892.900000</td>
+          <th>proc_inode_cache</th>
+          <td>94.000000</td>
+          <td>6656.000000</td>
         </tr>
         <tr>
-          <th>dmaengine-unmap-256</th>
-          <td>95.000000</td>
+          <th>dax_cache</th>
+          <td>94.000000</td>
           <td>32.700000</td>
+        </tr>
+        <tr>
+          <th>:a-0000104</th>
+          <td>94.926136</td>
+          <td>102185.309091</td>
+        </tr>
+        <tr>
+          <th>kmalloc-2k</th>
+          <td>95.000000</td>
+          <td>2048.000000</td>
         </tr>
         <tr>
           <th>mm_struct</th>
           <td>95.000000</td>
-          <td>360.400000</td>
+          <td>392.827273</td>
         </tr>
         <tr>
           <th>net_namespace</th>
@@ -478,19 +483,19 @@ Get most unefficient cache - averaged over time.
           <td>16.300000</td>
         </tr>
         <tr>
+          <th>sighand_cache</th>
+          <td>95.000000</td>
+          <td>916.754545</td>
+        </tr>
+        <tr>
+          <th>dmaengine-unmap-256</th>
+          <td>95.000000</td>
+          <td>32.700000</td>
+        </tr>
+        <tr>
           <th>:0000392</th>
           <td>95.000000</td>
           <td>16.300000</td>
-        </tr>
-        <tr>
-          <th>proc_inode_cache</th>
-          <td>95.282486</td>
-          <td>7277.920904</td>
-        </tr>
-        <tr>
-          <th>vm_area_struct</th>
-          <td>95.666667</td>
-          <td>5694.481356</td>
         </tr>
       </tbody>
     </table>
@@ -528,7 +533,11 @@ Create visualizations
     ]
     data = parse_slabinfo_log(slab_info)
     
-    data = [x for x in data if not x[1].startswith('# name') and not x[1].startswith('slabinfo')]
+    data = [x for x in data
+            if not x[1].startswith('# name')
+            and not x[1].startswith('slabinfo')
+            and len(x) == len(headers)]
+    
     
     # Sanity check!
     for l in data: assert len(l) == len(headers)
@@ -560,7 +569,7 @@ Create visualizations
 
 .. parsed-literal::
 
-    Test took: 3.17 minutes
+    Test took: 3.15 minutes
 
 
 
