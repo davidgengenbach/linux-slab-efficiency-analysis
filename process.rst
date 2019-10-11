@@ -6,6 +6,12 @@ In this notebook, I retrieve the results from a
 `lkp-tests <https://github.com/intel/lkp-tests>`__ benchmark and process
 the ``slabinfo`` file in it.
 
+**NOTE:** ``lkp-tests`` only sampled from ``/proc/slabinfo`` and **not**
+from ``/sys/kernel/slab/...``. So I added a custom monitor to
+``lkp-tests`` which gathers the data extracted by the
+`linux/tools/vm/slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c>`__
+tool.
+
 **Benchmark name:**
 ``fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml``
 
@@ -18,8 +24,8 @@ How the efficiency was calculated
 The efficiency means how much space the used objects need in principle,
 divided by the real memory usage.
 
-   efficiency_in_percent = (num_objs \* objsize \* 100) / (num_slabs \*
-   (page_size \* 2 \*\* order))
+    efficiency\_in\_percent = (num\_objs \* objsize \* 100) /
+    (num\_slabs \* (page\_size \* 2 \*\* order))
 
 The efficiency is calculated individually for each slab cache
 seperatedly in time.
@@ -32,38 +38,23 @@ Install instructions
 
 .. code:: bash
 
-   # or via ssh
-   git clone --depth 1 https://github.com/intel/lkp-tests
+    # or via ssh
+    git clone --depth 1 https://github.com/intel/lkp-tests
 
-   cd lkp-tests
-   # If this fails, try another OS
-   sudo make install
+    cd lkp-tests
+    # If this fails, try another OS
+    sudo make install
 
-   cd ..
+    cd ..
 
-   # Adapt the lkp-tests/hosts/YOUR_HOSTNAME file to have a `hdd_partition` section
-   # You can use the `create-block-device.sh` script provided in the root of this repository 
+    # Adapt the lkp-tests/hosts/YOUR_HOSTNAME file to have a `hdd_partition` section
+    # You can use the `create-block-device.sh` script provided in the root of this repository 
 
-   # This MUST be done after EVERY change to the "lkp-tests/hosts/YOUR_HOSTNAME" file!
-   lkp split lkp-tests/jobs/fsmark-1hdd.yaml
+    # This MUST be done after EVERY change to the "lkp-tests/hosts/YOUR_HOSTNAME" file!
+    lkp split lkp-tests/jobs/fsmark-1hdd.yaml
 
-   sudo lkp install fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
-   sudo lkp run fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
-
-Result
-------
-
-.. figure:: images/___lkp___result___fsmark___1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M___david-vm-ubuntu___ubuntu___x86_64-rhel-7.6___gcc-7___5.0.0-31-generic___2.png
-   :alt: Benchmark
-
-   Benchmark
-
-This is a histogram of the efficiencies of ALL slab caches over the
-whole time.
-
-**NOTE** this is not a weighted histogram, i.e. a small slab cache with
-100% efficiency has the same weight as a very big slab cache with only
-50% efficiency. So this histogram should be taken with a grain of salt
+    sudo lkp install fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
+    sudo lkp run fsmark-1hdd-1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M.yaml
 
 .. code:: ipython3
 
@@ -76,7 +67,11 @@ whole time.
     [NbConvertApp] Converting notebook process.ipynb to rst
     [NbConvertApp] Support files will be in process_files/
     [NbConvertApp] Making directory process_files
-    [NbConvertApp] Writing 10706 bytes to process.rst
+    [NbConvertApp] Making directory process_files
+    [NbConvertApp] Making directory process_files
+    [NbConvertApp] Making directory process_files
+    [NbConvertApp] Making directory process_files
+    [NbConvertApp] Writing 18528 bytes to process.rst
 
 
 Retrieve lkp-tests result folder from VM
@@ -85,11 +80,31 @@ Retrieve lkp-tests result folder from VM
 .. code:: ipython3
 
     HOST="david-vm-ubuntu"
+    TIMESTAMP = !date +%s
     !mkdir -p results
-    !mv results/result results/result_`(date +%s)`
     !ssh {HOST} 'cd projects; echo "a" | sudo -S ./save_slab_orders.sh'
-    !scp -r -q {HOST}:projects/result results
-    !ssh {HOST} 'ls -l projects/result | cut -d ">" -f 2' > results/result/job
+    !scp -r -q {HOST}:projects/result results/result_{TIMESTAMP}
+    !ssh {HOST} 'ls -l projects/result | cut -d ">" -f 2' > results/result_{TIMESTAMP}/job
+
+
+.. parsed-literal::
+
+    [sudo] password for vm: 
+
+Setup visualizations
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    %matplotlib inline
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import matplotlib
+    import seaborn as sns
+    
+    sns.set_style('whitegrid')
+    
+    matplotlib.rcParams['figure.figsize'] = (10.0, 6.0)
 
 Parse results
 -------------
@@ -97,9 +112,8 @@ Parse results
 .. code:: ipython3
 
     import os
-    
-    FOLDER = 'results/result'
-    FILE = FOLDER + '/slabinfo'
+    from glob import glob
+    FOLDER = sorted(glob('results/result_*'))[0]
     IMAGE_FOLDER = 'images'
     
     os.makedirs(IMAGE_FOLDER, exist_ok=True)
@@ -107,13 +121,394 @@ Parse results
     with open(FOLDER + '/job') as f:
         job_name = f.read().strip()
     
-    with open(FILE) as f:
+    with open(FOLDER + '/slabinfo') as f:
         slab_info = f.read().splitlines()
+    
+    with open(FOLDER + '/slabinfo_tool') as f:
+        slab_info_tool = f.read().splitlines()
     
     with open(FOLDER + '/orders') as f:
         orders = {x.split()[0]: int(x.split()[1]) for x in f.readlines()}
     
-    # Extracted from `slabinfo`
+    def convert_num(x):
+        try:
+            return int(x)
+        except:
+            return x
+    
+    def parse_slabinfo_log(lkp_tests_slab_info):
+        data = []
+        current = None
+        
+        for line in lkp_tests_slab_info:
+            if line.startswith('time:'):
+                current = int(line.split()[-1])
+                continue
+    
+            l = [current] + [convert_num(x.strip()) for x in line.split() if x is not ':']
+    
+            data.append(l)
+        return data
+    
+    job_name
+
+
+
+
+.. parsed-literal::
+
+    '/lkp/result/fsmark/1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M/david-vm-ubuntu/ubuntu/x86_64-rhel-7.6/gcc-7/5.0.0-31-generic/12'
+
+
+
+slabinfo tool
+-------------
+
+See
+`slabinfo.c <https://github.com/torvalds/linux/blob/8a8c600de5dc1d9a7f4b83269fddc80ebd3dd045/tools/vm/slabinfo.c#L644>`__
+for more information.
+
+The tool uses ``/sys/kernel/slab/...`` and **NOT** ``/proc/slabinfo``.
+
+.. code:: ipython3
+
+    import pandas as pd
+    
+    # Headers taken from output of `slabinfo`
+    SLABINFO_TOOL_HEADERS = [
+        'time', # added
+        'name',
+        'objects',
+        'object_size',
+        'space',
+        'slabs_part_cpu',
+        'o_s',
+        'o',
+        'percent_free',
+        'percent_efficient',
+        'flags'
+    ]
+    
+    df_slabinfo_tool = pd.DataFrame(
+        # Ignore header
+        [x for x in parse_slabinfo_log(slab_info_tool) if not x[1].startswith('Name')],
+        columns = SLABINFO_TOOL_HEADERS
+    )
+    
+    # Filter out "filp" cache which has a efficiency above 100%?
+    df_slabinfo_tool = df_slabinfo_tool[df_slabinfo_tool.percent_efficient <= 100]
+    
+    # Converts the '10.9K' and '10.1M' space notation to numbers (Kb)
+    def normalize_space(x):
+        num = float(x[:-1])
+        if x.endswith('M'):
+            num = num * 1024
+        return num
+    
+    df_slabinfo_tool['space_normalized_in_kb'] = df_slabinfo_tool.space.apply(normalize_space)
+    # Check that the only suffixes are 'K' (kilo) and 'M' (mega)
+    for idx, x in df_slabinfo_tool.space.iteritems():
+        assert(x.endswith('K') or x.endswith('M'))
+
+Plot efficiency (histogram)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    df_slabinfo_tool.percent_efficient.plot(kind='hist', bins=60)
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f6c91a11668>
+
+
+
+
+.. image:: process_files/process_11_1.png
+
+
+Plot efficiency (timeline)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    ax = df_slabinfo_tool.groupby('time').percent_efficient.mean().plot()
+    ax.set_title('Average SLAB efficiency over time')
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5,1,'Average SLAB efficiency over time')
+
+
+
+
+.. image:: process_files/process_13_1.png
+
+
+Calculate and plot weighted efficiency (timeline)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The weighted efficiency takes the size of the cache into consideration
+
+.. code:: ipython3
+
+    import numpy as np
+    
+    # Taken from: https://stackoverflow.com/a/33054358
+    weighted_average_efficiency = df_slabinfo_tool.groupby('time').apply(lambda x: np.average(x.percent_efficient, weights=x.space_normalized_in_kb))
+    ax = weighted_average_efficiency.plot()
+    ax.set_title('Weighted average SLAB efficiency over time')
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5,1,'Weighted average SLAB efficiency over time')
+
+
+
+
+.. image:: process_files/process_15_1.png
+
+
+Plot efficiency of specific cache (dentry)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    dentries = df_slabinfo_tool[df_slabinfo_tool.name == 'dentry']
+    dentries.plot(x='time', y='percent_efficient')
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f6c9bdc5518>
+
+
+
+
+.. image:: process_files/process_17_1.png
+
+
+Most unefficient cache
+~~~~~~~~~~~~~~~~~~~~~~
+
+Get most unefficient cache - averaged over time.
+
+.. code:: ipython3
+
+    caches_sorted_by_efficiency = df_slabinfo_tool.groupby('name').mean().sort_values('percent_efficient')
+    caches_sorted_by_efficiency[['percent_efficient', 'space_normalized_in_kb']].head(30)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>percent_efficient</th>
+          <th>space_normalized_in_kb</th>
+        </tr>
+        <tr>
+          <th>name</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>skbuff_head_cache</th>
+          <td>72.000000</td>
+          <td>98.300000</td>
+        </tr>
+        <tr>
+          <th>scsi_sense_cache</th>
+          <td>75.000000</td>
+          <td>20.400000</td>
+        </tr>
+        <tr>
+          <th>kmalloc-96</th>
+          <td>78.903955</td>
+          <td>391.393220</td>
+        </tr>
+        <tr>
+          <th>names_cache</th>
+          <td>82.033898</td>
+          <td>442.582486</td>
+        </tr>
+        <tr>
+          <th>:a-0000256</th>
+          <td>82.706215</td>
+          <td>102.264407</td>
+        </tr>
+        <tr>
+          <th>task_struct</th>
+          <td>83.785311</td>
+          <td>3890.621469</td>
+        </tr>
+        <tr>
+          <th>:0000320</th>
+          <td>86.000000</td>
+          <td>368.600000</td>
+        </tr>
+        <tr>
+          <th>cred_jar</th>
+          <td>86.000000</td>
+          <td>278.453672</td>
+        </tr>
+        <tr>
+          <th>anon_vma</th>
+          <td>88.649718</td>
+          <td>824.288701</td>
+        </tr>
+        <tr>
+          <th>jbd2_journal_head</th>
+          <td>88.774011</td>
+          <td>173.901130</td>
+        </tr>
+        <tr>
+          <th>squashfs_inode_cache</th>
+          <td>89.000000</td>
+          <td>11059.200000</td>
+        </tr>
+        <tr>
+          <th>kmem_cache</th>
+          <td>90.000000</td>
+          <td>65.500000</td>
+        </tr>
+        <tr>
+          <th>biovec-max</th>
+          <td>90.016949</td>
+          <td>976.010734</td>
+        </tr>
+        <tr>
+          <th>TCPv6</th>
+          <td>91.000000</td>
+          <td>131.000000</td>
+        </tr>
+        <tr>
+          <th>bdev_cache</th>
+          <td>92.000000</td>
+          <td>65.500000</td>
+        </tr>
+        <tr>
+          <th>kmalloc-1k</th>
+          <td>92.502825</td>
+          <td>1331.200000</td>
+        </tr>
+        <tr>
+          <th>request_sock_TCP</th>
+          <td>93.000000</td>
+          <td>8.100000</td>
+        </tr>
+        <tr>
+          <th>kernfs_node_cache</th>
+          <td>93.000000</td>
+          <td>3788.800000</td>
+        </tr>
+        <tr>
+          <th>sighand_cache</th>
+          <td>93.768362</td>
+          <td>851.900000</td>
+        </tr>
+        <tr>
+          <th>dax_cache</th>
+          <td>94.000000</td>
+          <td>32.700000</td>
+        </tr>
+        <tr>
+          <th>file_lock_cache</th>
+          <td>94.000000</td>
+          <td>16.300000</td>
+        </tr>
+        <tr>
+          <th>request_queue</th>
+          <td>94.000000</td>
+          <td>131.000000</td>
+        </tr>
+        <tr>
+          <th>kmalloc-512</th>
+          <td>94.994350</td>
+          <td>892.900000</td>
+        </tr>
+        <tr>
+          <th>dmaengine-unmap-256</th>
+          <td>95.000000</td>
+          <td>32.700000</td>
+        </tr>
+        <tr>
+          <th>mm_struct</th>
+          <td>95.000000</td>
+          <td>360.400000</td>
+        </tr>
+        <tr>
+          <th>net_namespace</th>
+          <td>95.000000</td>
+          <td>65.500000</td>
+        </tr>
+        <tr>
+          <th>rpc_inode_cache</th>
+          <td>95.000000</td>
+          <td>16.300000</td>
+        </tr>
+        <tr>
+          <th>:0000392</th>
+          <td>95.000000</td>
+          <td>16.300000</td>
+        </tr>
+        <tr>
+          <th>proc_inode_cache</th>
+          <td>95.282486</td>
+          <td>7277.920904</td>
+        </tr>
+        <tr>
+          <th>vm_area_struct</th>
+          <td>95.666667</td>
+          <td>5694.481356</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+/proc/slabinfo
+--------------
+
+**Not to be confused with the output of the ``slabinfo`` tool!**
+
+Create visualizations
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    # Extracted from `/proc/slabinfo`
     headers = [
         'time',
         'name',
@@ -131,41 +526,12 @@ Parse results
         'num_slabs',
         'sharedavail',
     ]
-    
-    def convert_num(x):
-        try:
-            return int(x)
-        except:
-            return x
-    
-    def parse_slabinfo_log(lkp_tests_slab_info):
-        data = []
-        current = None
-        
-        for line in slab_info:
-            if line.startswith('time:'):
-                current = int(line.split()[-1])
-                continue
-            if line.startswith('# name'):
-                continue
-            if line.startswith('slabinfo'):
-                continue
-    
-            l = [current] + [convert_num(x.strip()) for x in line.split() if x is not ':']
-            assert len(l) == len(headers)
-            data.append(l)
-        return data
-    
     data = parse_slabinfo_log(slab_info)
-
-Create visualizations
----------------------
-
-.. code:: ipython3
-
-    %matplotlib inline
-    import pandas as pd
-    import matplotlib.pyplot as plt
+    
+    data = [x for x in data if not x[1].startswith('# name') and not x[1].startswith('slabinfo')]
+    
+    # Sanity check!
+    for l in data: assert len(l) == len(headers)
     
     df = pd.DataFrame(data, columns=headers)
     
@@ -194,31 +560,18 @@ Create visualizations
 
 .. parsed-literal::
 
-    Test took: 3.13 minutes
+    Test took: 3.17 minutes
 
 
 
-.. image:: process_files/process_8_1.png
-
-
-.. code:: ipython3
-
-    job_name
-
-
-
-
-.. parsed-literal::
-
-    '/lkp/result/fsmark/1HDD-9B-ext4-1x-16d-256fpd-32t-fsyncBeforeClose-400M/david-vm-ubuntu/ubuntu/x86_64-rhel-7.6/gcc-7/5.0.0-31-generic/2'
-
+.. image:: process_files/process_22_1.png
 
 
 VM specs
 --------
 
 **uname -a**: Linux david-vm-ubuntu 5.0.0-31-generic #33~18.04.1-Ubuntu
-SMP Tue Oct 1 10:20:39 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+SMP Tue Oct 1 10:20:39 UTC 2019 x86\_64 x86\_64 x86\_64 GNU/Linux
 
 .. raw:: html
 
